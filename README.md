@@ -51,12 +51,40 @@ brew install mcp-webreader
 
 **Repository:** https://github.com/mredig/MCP-WebReader
 
+### mcp-zedchat
+
+Swift-based MCP server for searching and accessing Zed editor chat history.
+
+**Install:**
+```bash
+brew install mcp-zedchat
+```
+
+**Features:**
+- **Four specialized tools:**
+  - `zed-list-threads` - List threads with optional date filtering
+  - `zed-get-message` - Get specific message with character-level pagination
+  - `zed-search-threads` - Search thread titles/summaries
+  - `zed-search-thread-content` - Search within messages with limited context
+- **Token-efficient** - Returns snippets with context, not full conversations
+- **Smart caching** - Caches decompressed thread content (zstd compression)
+- **Message indexing** - Access messages by index for stable retrieval
+- **Date filtering** - Filter threads by update date range
+
+**Performance:**
+- Handles searches across 299 threads with 9K+ messages
+- Cache eliminates repeated decompression (~1.7s for all threads)
+- String matching instead of regex for fast searches
+
+**Repository:** https://github.com/mredig/MCP-ZedChat
+
 ## Usage
 
 After installation, the tools are available as executables:
 
 ```bash
 mcp-webreader --help
+mcp-zedchat --help
 ```
 
 Refer to each tool's repository for detailed usage instructions and MCP integration.
