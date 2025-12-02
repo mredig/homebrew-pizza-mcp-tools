@@ -1,4 +1,4 @@
-name: Update mcp-zedchat Formula
+name: Update MCP Formulas
 
 on:
   workflow_dispatch:
@@ -11,28 +11,37 @@ permissions:
 jobs:
   update-formula:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - project: MCP-ZedChat
+            formula: mcp-zedchat.rb
+            tarball: mcp-zedchat-macos.tar.gz
+          - project: MCP-WebReader
+            formula: mcp-webreader.rb
+            tarball: mcp-webreader-macos.tar.gz
     
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       
-      - name: Get latest release info
+      - name: Get latest release info for ${{ matrix.project }}
         id: release
         run: |
           # Fetch latest release from GitHub API
-          RELEASE_JSON=$(curl -sL "https://api.github.com/repos/mredig/MCP-ZedChat/releases/latest")
+          RELEASE_JSON=$(curl -sL "https://api.github.com/repos/mredig/${{ matrix.project }}/releases/latest")
           VERSION=$(echo "$RELEASE_JSON" | jq -r '.tag_name')
           
           echo "Latest version: $VERSION"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           
           # Check current version in formula
-          CURRENT_VERSION=$(grep -oP 'releases/download/\K[^/]+' mcp-zedchat.rb)
+          CURRENT_VERSION=$(grep -oP 'releases/download/\K[^/]+' ${{ matrix.formula }})
           echo "Current version: $CURRENT_VERSION"
           echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
           
           # Download SHA256 from release
-          curl -sL "https://github.com/mredig/MCP-ZedChat/releases/download/${VERSION}/mcp-zedchat-macos.tar.gz.sha256" -o sha256.txt
+          curl -sL "https://github.com/mredig/${{ matrix.project }}/releases/download/${VERSION}/${{ matrix.tarball }}.sha256" -o sha256.txt
           SHA256=$(cat sha256.txt | awk '{print $1}')
           echo "sha256=$SHA256" >> $GITHUB_OUTPUT
           
@@ -56,17 +65,17 @@ jobs:
           SHA256="${{ steps.release.outputs.sha256 }}"
           
           # Update version and SHA in formula
-          sed -i.bak "s|releases/download/[^/]*/mcp-zedchat-macos.tar.gz|releases/download/${VERSION}/mcp-zedchat-macos.tar.gz|" mcp-zedchat.rb
-          sed -i.bak "s|sha256 \".*\"|sha256 \"${SHA256}\"|" mcp-zedchat.rb
-          rm mcp-zedchat.rb.bak
+          sed -i.bak "s|releases/download/[^/]*/${{ matrix.tarball }}|releases/download/${VERSION}/${{ matrix.tarball }}|" ${{ matrix.formula }}
+          sed -i.bak "s|sha256 \".*\"|sha256 \"${SHA256}\"|" ${{ matrix.formula }}
+          rm ${{ matrix.formula }}.bak
           
-          cat mcp-zedchat.rb
+          cat ${{ matrix.formula }}
       
       - name: Commit and push
         if: steps.check.outputs.needs_update == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add mcp-zedchat.rb
-          git commit -m "chore: update mcp-zedchat to ${{ steps.release.outputs.version }}"
+          git add ${{ matrix.formula }}
+          git commit -m "chore: update ${{ matrix.formula }} to ${{ steps.release.outputs.version }}"
           git push
