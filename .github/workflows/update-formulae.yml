@@ -32,6 +32,12 @@ jobs:
           RELEASE_JSON=$(curl -sL "https://api.github.com/repos/mredig/${{ matrix.project }}/releases/latest")
           VERSION=$(echo "$RELEASE_JSON" | jq -r '.tag_name')
           
+          # Validate version is not null or empty
+          if [ -z "$VERSION" ] || [ "$VERSION" = "null" ]; then
+            echo "Error: Failed to fetch valid version from GitHub API"
+            exit 1
+          fi
+          
           echo "Latest version: $VERSION"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           
@@ -43,6 +49,13 @@ jobs:
           # Download SHA256 from release
           curl -sL "https://github.com/mredig/${{ matrix.project }}/releases/download/${VERSION}/${{ matrix.tarball }}.sha256" -o sha256.txt
           SHA256=$(cat sha256.txt | awk '{print $1}')
+          
+          # Validate SHA256 is not empty and is valid hex
+          if [ -z "$SHA256" ] || [ "$SHA256" = "null" ] || ! echo "$SHA256" | grep -qE '^[a-f0-9]{64}$'; then
+            echo "Error: Invalid or missing SHA256: $SHA256"
+            exit 1
+          fi
+          
           echo "sha256=$SHA256" >> $GITHUB_OUTPUT
           
           echo "Downloaded SHA256: $SHA256"
