@@ -8,6 +8,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: update-formulas
+  cancel-in-progress: false
+
 jobs:
   update-formula:
     runs-on: ubuntu-latest
