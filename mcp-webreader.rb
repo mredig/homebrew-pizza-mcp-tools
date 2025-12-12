@@ -1,8 +1,8 @@
 class McpWebreader < Formula
   desc "MCP server for web reading with JS rendering, caching, and search - handles dynamic sites that break built-in fetch"
   homepage "https://github.com/mredig/MCP-WebReader"
-  url "https://github.com/mredig/MCP-WebReader/releases/download/0.1.6/mcp-webreader-macos.tar.gz"
-  sha256 "0a8d3a1001b4ed577521d9f75e1e491a05fe587b23e8807b2d231a38a79f9d3d"
+  url "https://github.com/mredig/MCP-WebReader/releases/download/0.2.0/mcp-webreader-macos.tar.gz"
+  sha256 "5ecadfff30f23c91fe3b9dee75b2348a31cb520673320d97fa04a4d0ee961486"
   license "MIT"
   head "https://github.com/mredig/MCP-WebReader.git", branch: "main"
 
