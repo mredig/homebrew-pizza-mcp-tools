@@ -78,13 +78,60 @@ brew install mcp-zedchat
 
 **Repository:** https://github.com/mredig/MCP-ZedChat
 
+### fingerstring
+
+Swift-based CLI tool for task list management with support for subtasks, notes, and list organization.
+
+**Install:**
+```bash
+brew install fingerstring
+```
+
+**Features:**
+- **Task management** - Create, edit, delete, and complete tasks
+- **Subtasks** - Organize tasks hierarchically with unlimited nesting
+- **Notes** - Add detailed notes to tasks and lists
+- **List organization** - Create and manage multiple task lists
+- **CLI commands:**
+  - `list-create`, `list-view`, `list-delete`, `list-all` - List management
+  - `task-add`, `task-view`, `task-edit`, `task-delete`, `task-complete` - Task management
+- **Persistent storage** - Tasks stored in SQLite database
+
+**Repository:** https://github.com/mredig/FingerString
+
+### mcp-fingerstring
+
+Swift-based MCP server exposing FingerString task management as an MCP interface. LLMs can use the mcp and users can track via the cli tool externally from the llm.
+
+**Install:**
+```bash
+brew install mcp-fingerstring
+```
+
+**Features:**
+- **Task tools:**
+  - `task-view` - View task details and subtasks
+  - `task-edit` - Edit task label or note
+  - `task-add` - Add tasks to lists or as subtasks
+  - `task-delete` - Delete tasks
+  - `task-complete` - Mark tasks complete/incomplete
+- **List tools:**
+  - `list-view` - View list with recursive subtask display
+  - `list-create` - Create new task lists
+  - `list-delete` - Delete lists
+  - `list-all` - Show all lists
+
+**Repository:** https://github.com/mredig/MCP-FingerString
+
 ## Usage
 
 After installation, the tools are available as executables:
 
 ```bash
+fingerstring --help
 mcp-webreader --help
 mcp-zedchat --help
+mcp-fingerstring --help
 ```
 
 Refer to each tool's repository for detailed usage instructions and MCP integration.

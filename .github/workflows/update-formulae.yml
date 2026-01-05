@@ -24,6 +24,12 @@ jobs:
           - project: MCP-WebReader
             formula: mcp-webreader.rb
             tarball: mcp-webreader-macos.tar.gz
+          - project: FingerString
+            formula: fingerstring.rb
+            tarball: fingerstring-macos.tar.gz
+          - project: MCP-FingerString
+            formula: mcp-fingerstring.rb
+            tarball: mcp-fingerstring-macos.tar.gz
     
     steps:
       - name: Checkout
