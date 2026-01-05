@@ -33,33 +33,60 @@ jobs:
           # Read metadata from JSON file
           META_FILE="metadata/${{ matrix.formula }}.json"
           
-          CLASS_NAME=$(jq -r '.class_name' "$META_FILE")
-          DESCRIPTION=$(jq -r '.description' "$META_FILE")
-          HOMEPAGE=$(jq -r '.homepage' "$META_FILE")
-          BINARY_NAME=$(jq -r '.binary_name' "$META_FILE")
-          PROJECT=$(jq -r '.project' "$META_FILE")
-          TARBALL_PREFIX=$(jq -r '.tarball_prefix' "$META_FILE")
+          if [ ! -f "$META_FILE" ]; then
+            echo "Error: Metadata file not found: $META_FILE"
+            exit 1
+          fi
+          
+          echo "Metadata file contents:"
+          cat "$META_FILE"
+          echo ""
+          
+          CLASS_NAME=$(jq -r '.class_name' "$META_FILE") || { echo "Failed to parse class_name"; cat "$META_FILE"; exit 1; }
+          DESCRIPTION=$(jq -r '.description' "$META_FILE") || { echo "Failed to parse description"; cat "$META_FILE"; exit 1; }
+          HOMEPAGE=$(jq -r '.homepage' "$META_FILE") || { echo "Failed to parse homepage"; cat "$META_FILE"; exit 1; }
+          BINARY_NAME=$(jq -r '.binary_name' "$META_FILE") || { echo "Failed to parse binary_name"; cat "$META_FILE"; exit 1; }
+          PROJECT=$(jq -r '.project' "$META_FILE") || { echo "Failed to parse project"; cat "$META_FILE"; exit 1; }
+          TARBALL_PREFIX=$(jq -r '.tarball_prefix' "$META_FILE") || { echo "Failed to parse tarball_prefix"; cat "$META_FILE"; exit 1; }
           
           echo "class_name=$CLASS_NAME" >> $GITHUB_OUTPUT
-          echo "description=$DESCRIPTION" >> $GITHUB_OUTPUT
+          # Use delimiter for description in case it contains special characters
+          {
+            echo "description<<EOF"
+            echo "$DESCRIPTION"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
           echo "homepage=$HOMEPAGE" >> $GITHUB_OUTPUT
           echo "binary_name=$BINARY_NAME" >> $GITHUB_OUTPUT
           echo "project=$PROJECT" >> $GITHUB_OUTPUT
           echo "tarball_prefix=$TARBALL_PREFIX" >> $GITHUB_OUTPUT
       
-      - name: Get latest release info for ${{ steps.metadata.outputs.project }}
+      - name: Get latest release info for ${{ matrix.formula }}
         id: release
         run: |
           PROJECT="${{ steps.metadata.outputs.project }}"
           TARBALL_PREFIX="${{ steps.metadata.outputs.tarball_prefix }}"
           
+          echo "Project: $PROJECT"
+          echo "Tarball prefix: $TARBALL_PREFIX"
+          
           # Fetch latest release from GitHub API
           RELEASE_JSON=$(curl -sL "https://api.github.com/repos/mredig/${PROJECT}/releases/latest")
+          
+          # Check if response is valid JSON before parsing
+          if ! echo "$RELEASE_JSON" | jq empty 2>/dev/null; then
+            echo "Error: Invalid JSON response from GitHub API:"
+            echo "$RELEASE_JSON"
+            exit 1
+          fi
+          
           VERSION=$(echo "$RELEASE_JSON" | jq -r '.tag_name')
           
           # Validate version is not null or empty
           if [ -z "$VERSION" ] || [ "$VERSION" = "null" ]; then
             echo "Error: Failed to fetch valid version from GitHub API"
+            echo "Response was:"
+            echo "$RELEASE_JSON"
             exit 1
           fi
           
