@@ -99,8 +99,8 @@ jobs:
           echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
           
           # Download macOS SHA256 from release
-          curl -sL "https://github.com/mredig/${PROJECT}/releases/download/${VERSION}/${TARBALL_PREFIX}-macos.tar.gz.sha256" -o macos-sha256.txt
-          MACOS_SHA256=$(cat macos-sha256.txt | awk '{print $1}')
+          curl -sL "https://github.com/mredig/${PROJECT}/releases/download/${VERSION}/${TARBALL_PREFIX}-macos.tar.gz.sha256" -o /tmp/macos-sha256.txt
+          MACOS_SHA256=$(cat /tmp/macos-sha256.txt | awk '{print $1}')
           
           # Validate macOS SHA256
           if [ -z "$MACOS_SHA256" ] || ! echo "$MACOS_SHA256" | grep -qE '^[a-f0-9]{64}$'; then
@@ -111,8 +111,8 @@ jobs:
           echo "Downloaded macOS SHA256: $MACOS_SHA256"
           
           # Download Linux SHA256 from release
-          curl -sL "https://github.com/mredig/${PROJECT}/releases/download/${VERSION}/${TARBALL_PREFIX}-linux.tar.gz.sha256" -o linux-sha256.txt
-          LINUX_SHA256=$(cat linux-sha256.txt | awk '{print $1}')
+          curl -sL "https://github.com/mredig/${PROJECT}/releases/download/${VERSION}/${TARBALL_PREFIX}-linux.tar.gz.sha256" -o /tmp/linux-sha256.txt
+          LINUX_SHA256=$(cat /tmp/linux-sha256.txt | awk '{print $1}')
           
           # Validate Linux SHA256
           if [ -z "$LINUX_SHA256" ] || ! echo "$LINUX_SHA256" | grep -qE '^[a-f0-9]{64}$'; then
