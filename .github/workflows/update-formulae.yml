@@ -93,8 +93,8 @@ jobs:
           echo "Latest version: $VERSION"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           
-          # Check current version in formula (get first match only)
-          CURRENT_VERSION=$(grep -oP 'version "\K[^"]+' "${{ matrix.formula }}.rb" 2>/dev/null || echo "none")
+          # Check current version in formula (extract from URL)
+          CURRENT_VERSION=$(grep -oP 'releases/download/\K[^/]+' "${{ matrix.formula }}.rb" 2>/dev/null | head -1 || echo "none")
           echo "Current version: $CURRENT_VERSION"
           echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
           
