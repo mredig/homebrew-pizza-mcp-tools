@@ -1,0 +1,8 @@
+{
+	"class_name": "McpWebreader",
+	"description": "MCP server for web content reading with JavaScript rendering, caching, and search",
+	"homepage": "https://github.com/mredig/MCP-WebReader",
+	"binary_name": "mcp-webreader",
+	"project": "MCP-WebReader",
+	"tarball_prefix": "mcp-webreader"
+}

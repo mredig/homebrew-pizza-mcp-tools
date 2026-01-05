@@ -17,29 +17,44 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        include:
-          - project: MCP-ZedChat
-            formula: mcp-zedchat.rb
-            tarball: mcp-zedchat-macos.tar.gz
-          - project: MCP-WebReader
-            formula: mcp-webreader.rb
-            tarball: mcp-webreader-macos.tar.gz
-          - project: FingerString
-            formula: fingerstring.rb
-            tarball: fingerstring-macos.tar.gz
-          - project: MCP-FingerString
-            formula: mcp-fingerstring.rb
-            tarball: mcp-fingerstring-macos.tar.gz
+        formula:
+          - mcp-zedchat
+          - mcp-webreader
+          - fingerstring
+          - mcp-fingerstring
     
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       
-      - name: Get latest release info for ${{ matrix.project }}
+      - name: Read metadata for ${{ matrix.formula }}
+        id: metadata
+        run: |
+          # Read metadata from JSON file
+          META_FILE="metadata/${{ matrix.formula }}.json"
+          
+          CLASS_NAME=$(jq -r '.class_name' "$META_FILE")
+          DESCRIPTION=$(jq -r '.description' "$META_FILE")
+          HOMEPAGE=$(jq -r '.homepage' "$META_FILE")
+          BINARY_NAME=$(jq -r '.binary_name' "$META_FILE")
+          PROJECT=$(jq -r '.project' "$META_FILE")
+          TARBALL_PREFIX=$(jq -r '.tarball_prefix' "$META_FILE")
+          
+          echo "class_name=$CLASS_NAME" >> $GITHUB_OUTPUT
+          echo "description=$DESCRIPTION" >> $GITHUB_OUTPUT
+          echo "homepage=$HOMEPAGE" >> $GITHUB_OUTPUT
+          echo "binary_name=$BINARY_NAME" >> $GITHUB_OUTPUT
+          echo "project=$PROJECT" >> $GITHUB_OUTPUT
+          echo "tarball_prefix=$TARBALL_PREFIX" >> $GITHUB_OUTPUT
+      
+      - name: Get latest release info for ${{ steps.metadata.outputs.project }}
         id: release
         run: |
+          PROJECT="${{ steps.metadata.outputs.project }}"
+          TARBALL_PREFIX="${{ steps.metadata.outputs.tarball_prefix }}"
+          
           # Fetch latest release from GitHub API
-          RELEASE_JSON=$(curl -sL "https://api.github.com/repos/mredig/${{ matrix.project }}/releases/latest")
+          RELEASE_JSON=$(curl -sL "https://api.github.com/repos/mredig/${PROJECT}/releases/latest")
           VERSION=$(echo "$RELEASE_JSON" | jq -r '.tag_name')
           
           # Validate version is not null or empty
@@ -51,24 +66,34 @@ jobs:
           echo "Latest version: $VERSION"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           
-          # Check current version in formula
-          CURRENT_VERSION=$(grep -oP 'releases/download/\K[^/]+' ${{ matrix.formula }})
+          # Check current version in formula (get first match only)
+          CURRENT_VERSION=$(grep -oP 'version "\K[^"]+' "${{ matrix.formula }}.rb" 2>/dev/null || echo "none")
           echo "Current version: $CURRENT_VERSION"
           echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
           
-          # Download SHA256 from release
-          curl -sL "https://github.com/mredig/${{ matrix.project }}/releases/download/${VERSION}/${{ matrix.tarball }}.sha256" -o sha256.txt
-          SHA256=$(cat sha256.txt | awk '{print $1}')
+          # Download macOS SHA256 from release
+          curl -sL "https://github.com/mredig/${PROJECT}/releases/download/${VERSION}/${TARBALL_PREFIX}-macos.tar.gz.sha256" -o macos-sha256.txt
+          MACOS_SHA256=$(cat macos-sha256.txt | awk '{print $1}')
           
-          # Validate SHA256 is not empty and is valid hex
-          if [ -z "$SHA256" ] || [ "$SHA256" = "null" ] || ! echo "$SHA256" | grep -qE '^[a-f0-9]{64}$'; then
-            echo "Error: Invalid or missing SHA256: $SHA256"
+          # Validate macOS SHA256
+          if [ -z "$MACOS_SHA256" ] || ! echo "$MACOS_SHA256" | grep -qE '^[a-f0-9]{64}$'; then
+            echo "Error: Invalid or missing macOS SHA256: $MACOS_SHA256"
             exit 1
           fi
+          echo "macos_sha256=$MACOS_SHA256" >> $GITHUB_OUTPUT
+          echo "Downloaded macOS SHA256: $MACOS_SHA256"
           
-          echo "sha256=$SHA256" >> $GITHUB_OUTPUT
+          # Download Linux SHA256 from release
+          curl -sL "https://github.com/mredig/${PROJECT}/releases/download/${VERSION}/${TARBALL_PREFIX}-linux.tar.gz.sha256" -o linux-sha256.txt
+          LINUX_SHA256=$(cat linux-sha256.txt | awk '{print $1}')
           
-          echo "Downloaded SHA256: $SHA256"
+          # Validate Linux SHA256
+          if [ -z "$LINUX_SHA256" ] || ! echo "$LINUX_SHA256" | grep -qE '^[a-f0-9]{64}$'; then
+            echo "Error: Invalid or missing Linux SHA256: $LINUX_SHA256"
+            exit 1
+          fi
+          echo "linux_sha256=$LINUX_SHA256" >> $GITHUB_OUTPUT
+          echo "Downloaded Linux SHA256: $LINUX_SHA256"
       
       - name: Check if update needed
         id: check
@@ -81,24 +106,37 @@ jobs:
             echo "needs_update=true" >> $GITHUB_OUTPUT
           fi
       
-      - name: Update formula
+      - name: Generate formula from template
         if: steps.check.outputs.needs_update == 'true'
         run: |
+          PROJECT="${{ steps.metadata.outputs.project }}"
+          TARBALL_PREFIX="${{ steps.metadata.outputs.tarball_prefix }}"
           VERSION="${{ steps.release.outputs.version }}"
-          SHA256="${{ steps.release.outputs.sha256 }}"
           
-          # Update version and SHA in formula
-          sed -i.bak "s|releases/download/[^/]*/${{ matrix.tarball }}|releases/download/${VERSION}/${{ matrix.tarball }}|" ${{ matrix.formula }}
-          sed -i.bak "s|sha256 \".*\"|sha256 \"${SHA256}\"|" ${{ matrix.formula }}
-          rm ${{ matrix.formula }}.bak
+          MACOS_URL="https://github.com/mredig/${PROJECT}/releases/download/${VERSION}/${TARBALL_PREFIX}-macos.tar.gz"
+          LINUX_URL="https://github.com/mredig/${PROJECT}/releases/download/${VERSION}/${TARBALL_PREFIX}-linux.tar.gz"
           
-          cat ${{ matrix.formula }}
+          # Generate formula from template
+          sed \
+            -e 's|{{CLASS_NAME}}|${{ steps.metadata.outputs.class_name }}|g' \
+            -e 's|{{DESCRIPTION}}|${{ steps.metadata.outputs.description }}|g' \
+            -e 's|{{HOMEPAGE}}|${{ steps.metadata.outputs.homepage }}|g' \
+            -e 's|{{VERSION}}|'"${VERSION}"'|g' \
+            -e 's|{{MACOS_URL}}|'"${MACOS_URL}"'|g' \
+            -e 's|{{MACOS_SHA256}}|${{ steps.release.outputs.macos_sha256 }}|g' \
+            -e 's|{{LINUX_URL}}|'"${LINUX_URL}"'|g' \
+            -e 's|{{LINUX_SHA256}}|${{ steps.release.outputs.linux_sha256 }}|g' \
+            -e 's|{{BINARY_NAME}}|${{ steps.metadata.outputs.binary_name }}|g' \
+            .formula-template > "${{ matrix.formula }}.rb"
+          
+          echo "Generated formula:"
+          cat "${{ matrix.formula }}.rb"
       
       - name: Commit and push
         if: steps.check.outputs.needs_update == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add ${{ matrix.formula }}
-          git commit -m "chore: update ${{ matrix.formula }} to ${{ steps.release.outputs.version }}"
+          git add "${{ matrix.formula }}.rb"
+          git commit -m "chore: update ${{ matrix.formula }}.rb to ${{ steps.release.outputs.version }}"
           git push

@@ -1,0 +1,25 @@
+class {{CLASS_NAME}} < Formula
+  desc "{{DESCRIPTION}}"
+  homepage "{{HOMEPAGE}}"
+  license "MIT"
+  head "{{HOMEPAGE}}.git", branch: "main"
+
+  on_macos do
+    url "{{MACOS_URL}}"
+    sha256 "{{MACOS_SHA256}}"
+  end
+
+  on_linux do
+    url "{{LINUX_URL}}"
+    sha256 "{{LINUX_SHA256}}"
+  end
+
+  def install
+    bin.install "{{BINARY_NAME}}"
+  end
+
+  test do
+    assert_predicate bin/"{{BINARY_NAME}}", :exist?
+    assert_predicate bin/"{{BINARY_NAME}}", :executable?
+  end
+end

@@ -1,0 +1,8 @@
+{
+  "class_name": "Fingerstring",
+  "description": "CLI tool for task list management with subtasks and notes",
+  "homepage": "https://github.com/mredig/FingerString",
+  "binary_name": "fingerstring",
+  "project": "FingerString",
+  "tarball_prefix": "fingerstring"
+}

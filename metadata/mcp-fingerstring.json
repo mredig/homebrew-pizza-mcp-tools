@@ -1,0 +1,8 @@
+{
+  "class_name": "McpFingerstring",
+  "description": "MCP server for FingerString task management",
+  "homepage": "https://github.com/mredig/MCP-FingerString",
+  "binary_name": "mcp-fingerstring",
+  "project": "MCP-FingerString",
+  "tarball_prefix": "mcp-fingerstring"
+}
