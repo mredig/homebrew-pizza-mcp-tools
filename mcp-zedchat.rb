@@ -1,8 +1,8 @@
 class McpZedchat < Formula
   desc "MCP server for searching and accessing Zed editor chat history"
   homepage "https://github.com/mredig/MCP-ZedChat"
-  url "https://github.com/mredig/MCP-ZedChat/releases/download/0.3.0b2/mcp-zedchat-macos.tar.gz"
-  sha256 "9e9a33d274ed3fb05921e039665e6c7f7edc8a2d5b2fd870d217cc81de048608"
+  url "https://github.com/mredig/MCP-ZedChat/releases/download/0.3.0/mcp-zedchat-macos.tar.gz"
+  sha256 "53238fb049a97de81fc5a1f680d51848b856ea26b74e65172d2858ec4b24adfe"
   license "MIT"
   head "https://github.com/mredig/MCP-ZedChat.git", branch: "main"
 
