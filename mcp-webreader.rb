@@ -5,13 +5,13 @@ class McpWebreader < Formula
   head "https://github.com/mredig/MCP-WebReader.git", branch: "main"
 
   on_macos do
-    url "https://github.com/mredig/MCP-WebReader/releases/download/0.3.0/mcp-webreader-macos.tar.gz"
-    sha256 "f5a8de25761a1f18d81e7bd2b4c4af2c9e45af135ccd3908ef22df715a251d63"
+    url "https://github.com/mredig/MCP-WebReader/releases/download/0.4.0/mcp-webreader-macos.tar.gz"
+    sha256 "443023b660864c52310c2f7880e4598c80b35b05899f270bc27f37ef5d4009e9"
   end
 
   on_linux do
-    url "https://github.com/mredig/MCP-WebReader/releases/download/0.3.0/mcp-webreader-linux.tar.gz"
-    sha256 "be91ef0c9d5804b15eea3d819b657c835d196ce0f9aa612cbf695f90a0f8da5c"
+    url "https://github.com/mredig/MCP-WebReader/releases/download/0.4.0/mcp-webreader-linux.tar.gz"
+    sha256 "6f1cacf19a7c9b7ad2f63f10693cb6e75a32e0db56320a0abcc2244163c9eb0b"
   end
 
   def install
