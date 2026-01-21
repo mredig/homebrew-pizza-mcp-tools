@@ -5,13 +5,13 @@ class Fingerstring < Formula
   head "https://github.com/mredig/FingerString.git", branch: "main"
 
   on_macos do
-    url "https://github.com/mredig/FingerString/releases/download/0.0.6b1/fingerstring-macos.tar.gz"
-    sha256 "6acace5a06a5d1dc83d6645b7ac2d09e3e9c4605c1e07528d2037fa5ca227265"
+    url "https://github.com/mredig/FingerString/releases/download/0.0.6b2/fingerstring-macos.tar.gz"
+    sha256 "98f7df19cb3a2592c70274d4cc6a1bc384132c853534a9d0916685dfc78cd6c5"
   end
 
   on_linux do
-    url "https://github.com/mredig/FingerString/releases/download/0.0.6b1/fingerstring-linux.tar.gz"
-    sha256 "4948dde654acd8d3db682c601d66a582a4e1f7aff819763aa82cc02fb38c2df6"
+    url "https://github.com/mredig/FingerString/releases/download/0.0.6b2/fingerstring-linux.tar.gz"
+    sha256 "ad8c06092f2620cfa938c92a686e348dc314b3fdb6b2ca47d6c903b8de9cf3a5"
   end
 
   def install
