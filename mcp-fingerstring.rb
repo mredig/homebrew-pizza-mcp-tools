@@ -5,13 +5,13 @@ class McpFingerstring < Formula
   head "https://github.com/mredig/MCP-FingerString.git", branch: "main"
 
   on_macos do
-    url "https://github.com/mredig/MCP-FingerString/releases/download/0.0.4/mcp-fingerstring-macos.tar.gz"
-    sha256 "8d8cc7bf7380cffd80a7bf45443ea75df43320b28d5ee96a7efe1dc3f94e7480"
+    url "https://github.com/mredig/MCP-FingerString/releases/download/0.0.7/mcp-fingerstring-macos.tar.gz"
+    sha256 "a306c3bef2a7adef5013e8b6cf657570a817095300a91b180de5ce13535bc6bf"
   end
 
   on_linux do
-    url "https://github.com/mredig/MCP-FingerString/releases/download/0.0.4/mcp-fingerstring-linux.tar.gz"
-    sha256 "8e2ade0621c51298b822bb7b68066f9d8d2ac9529d4ddab7c3efe030e9d8bfd1"
+    url "https://github.com/mredig/MCP-FingerString/releases/download/0.0.7/mcp-fingerstring-linux.tar.gz"
+    sha256 "6bbff2fc897a6996473caef2e213fad93caefd866afd03bcbd3ff5d9eacdd742"
   end
 
   def install
