@@ -5,13 +5,13 @@ class McpZedchat < Formula
   head "https://github.com/mredig/MCP-ZedChat.git", branch: "main"
 
   on_macos do
-    url "https://github.com/mredig/MCP-ZedChat/releases/download/0.5.3/mcp-zedchat-macos.tar.gz"
-    sha256 "2f9967c698dae4a3c44e10b21ef0eaee59c566aad27003bc9cdc255a9377afda"
+    url "https://github.com/mredig/MCP-ZedChat/releases/download/0.6.0/mcp-zedchat-macos.tar.gz"
+    sha256 "9b7d115f4d3e705263e2ba5495275ce27a5efb4158e6a64cbcf5c42762e3ba66"
   end
 
   on_linux do
-    url "https://github.com/mredig/MCP-ZedChat/releases/download/0.5.3/mcp-zedchat-linux.tar.gz"
-    sha256 "641f17de80cd0ddc45678e9f44824b50942664883a84433a2e3e17230c731774"
+    url "https://github.com/mredig/MCP-ZedChat/releases/download/0.6.0/mcp-zedchat-linux.tar.gz"
+    sha256 "a86b7a2da7895939ff0351db5b19e399e42a61d31d295bb5c98abbaebd009de5"
   end
 
   def install
