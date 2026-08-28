@@ -15,11 +15,10 @@ class {{CLASS_NAME}} < Formula
   end
 
   def install
-    bin.install "{{BINARY_NAME}}"
+{{INSTALL_LINES}}
   end
 
   test do
-    assert_predicate bin/"{{BINARY_NAME}}", :exist?
-    assert_predicate bin/"{{BINARY_NAME}}", :executable?
+{{TEST_LINES}}
   end
 end

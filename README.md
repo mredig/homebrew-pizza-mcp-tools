@@ -51,25 +51,32 @@ brew install mcp-webreader
 
 **Repository:** https://github.com/mredig/MCP-WebReader
 
-### mcp-zedchat
+### mcp-zedhist
 
-Swift-based MCP server for searching and accessing Zed editor chat history.
+Swift-based MCP server **and** CLI for searching and accessing Zed editor agent chat history. One formula installs two binaries: `mcp-zedhist` (the MCP server) and `zedhist` (the terminal CLI).
 
 **Install:**
 ```bash
-brew install mcp-zedchat
+brew install mcp-zedhist
 ```
 
-**Features:**
-- **Four specialized tools:**
-  - `zed-list-threads` - List threads with optional date filtering
+**MCP features:**
+- **Five specialized tools:**
+  - `zed-list-threads` - List threads with optional date filtering and limits
   - `zed-get-message` - Get specific message with character-level pagination
+  - `zed-get-metadata` - Get thread/message metadata (counts, roles, timestamps, model info)
   - `zed-search-threads` - Search thread titles/summaries
   - `zed-search-thread-content` - Search within messages with limited context
 - **Token-efficient** - Returns snippets with context, not full conversations
 - **Smart caching** - Caches decompressed thread content (zstd compression)
 - **Message indexing** - Access messages by index for stable retrieval
 - **Date filtering** - Filter threads by update date range
+
+**CLI features (`zedhist`):**
+- `zedhist list-threads` - List threads with date/limit filters
+- `zedhist get-message <threadID>` - Print a specific message
+- `zedhist extract-json-blobs` - Dump decompressed thread JSON to a folder
+- `zedhist troubleshoot` - Sanity-check the threads database
 
 **Performance:**
 - Handles searches across 299 threads with 9K+ messages
@@ -130,7 +137,8 @@ After installation, the tools are available as executables:
 ```bash
 fingerstring --help
 mcp-webreader --help
-mcp-zedchat --help
+mcp-zedhist --help
+zedhist --help
 mcp-fingerstring --help
 ```
 

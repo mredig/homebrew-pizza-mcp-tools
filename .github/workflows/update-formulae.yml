@@ -18,7 +18,7 @@ jobs:
     strategy:
       matrix:
         formula:
-          - mcp-zedchat
+          - mcp-zedhist
           - mcp-webreader
           - fingerstring
           - mcp-fingerstring
@@ -42,22 +42,9 @@ jobs:
           cat "$META_FILE"
           echo ""
           
-          CLASS_NAME=$(jq -r '.class_name' "$META_FILE") || { echo "Failed to parse class_name"; cat "$META_FILE"; exit 1; }
-          DESCRIPTION=$(jq -r '.description' "$META_FILE") || { echo "Failed to parse description"; cat "$META_FILE"; exit 1; }
-          HOMEPAGE=$(jq -r '.homepage' "$META_FILE") || { echo "Failed to parse homepage"; cat "$META_FILE"; exit 1; }
-          BINARY_NAME=$(jq -r '.binary_name' "$META_FILE") || { echo "Failed to parse binary_name"; cat "$META_FILE"; exit 1; }
           PROJECT=$(jq -r '.project' "$META_FILE") || { echo "Failed to parse project"; cat "$META_FILE"; exit 1; }
           TARBALL_PREFIX=$(jq -r '.tarball_prefix' "$META_FILE") || { echo "Failed to parse tarball_prefix"; cat "$META_FILE"; exit 1; }
           
-          echo "class_name=$CLASS_NAME" >> $GITHUB_OUTPUT
-          # Use delimiter for description in case it contains special characters
-          {
-            echo "description<<EOF"
-            echo "$DESCRIPTION"
-            echo "EOF"
-          } >> $GITHUB_OUTPUT
-          echo "homepage=$HOMEPAGE" >> $GITHUB_OUTPUT
-          echo "binary_name=$BINARY_NAME" >> $GITHUB_OUTPUT
           echo "project=$PROJECT" >> $GITHUB_OUTPUT
           echo "tarball_prefix=$TARBALL_PREFIX" >> $GITHUB_OUTPUT
       
@@ -136,26 +123,12 @@ jobs:
       - name: Generate formula from template
         if: steps.check.outputs.needs_update == 'true'
         run: |
-          PROJECT="${{ steps.metadata.outputs.project }}"
-          TARBALL_PREFIX="${{ steps.metadata.outputs.tarball_prefix }}"
-          VERSION="${{ steps.release.outputs.version }}"
-          
-          MACOS_URL="https://github.com/mredig/${PROJECT}/releases/download/${VERSION}/${TARBALL_PREFIX}-macos.tar.gz"
-          LINUX_URL="https://github.com/mredig/${PROJECT}/releases/download/${VERSION}/${TARBALL_PREFIX}-linux.tar.gz"
-          
-          # Generate formula from template
-          sed \
-            -e 's|{{CLASS_NAME}}|${{ steps.metadata.outputs.class_name }}|g' \
-            -e 's|{{DESCRIPTION}}|${{ steps.metadata.outputs.description }}|g' \
-            -e 's|{{HOMEPAGE}}|${{ steps.metadata.outputs.homepage }}|g' \
-            -e 's|{{VERSION}}|'"${VERSION}"'|g' \
-            -e 's|{{MACOS_URL}}|'"${MACOS_URL}"'|g' \
-            -e 's|{{MACOS_SHA256}}|${{ steps.release.outputs.macos_sha256 }}|g' \
-            -e 's|{{LINUX_URL}}|'"${LINUX_URL}"'|g' \
-            -e 's|{{LINUX_SHA256}}|${{ steps.release.outputs.linux_sha256 }}|g' \
-            -e 's|{{BINARY_NAME}}|${{ steps.metadata.outputs.binary_name }}|g' \
-            .formula-template > "${{ matrix.formula }}.rb"
-          
+          python3 scripts/generate-formula.py \
+            "${{ matrix.formula }}" \
+            "${{ steps.release.outputs.version }}" \
+            "${{ steps.release.outputs.macos_sha256 }}" \
+            "${{ steps.release.outputs.linux_sha256 }}"
+
           echo "Generated formula:"
           cat "${{ matrix.formula }}.rb"
       

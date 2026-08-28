@@ -1,0 +1,11 @@
+{
+  "class_name": "McpZedhist",
+  "description": "MCP server and CLI for searching and accessing Zed editor agent chat history",
+  "homepage": "https://github.com/mredig/MCP-ZedChat",
+  "binaries": [
+    "mcp-zedhist",
+    "zedhist"
+  ],
+  "project": "MCP-ZedChat",
+  "tarball_prefix": "zedhist"
+}
